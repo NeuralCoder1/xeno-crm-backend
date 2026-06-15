@@ -4,20 +4,26 @@ import { connectRedis, redisClient } from "../config/redis";
 export interface HealthStatus {
   status: "ok";
   database: "connected";
-  redis: "connected";
+  redis: "connected" | "unavailable";
   timestamp: string;
 }
 
 export class HealthService {
   async getHealth(): Promise<HealthStatus> {
     await prisma.$queryRaw`SELECT 1`;
-    await connectRedis();
-    await redisClient.ping();
+
+    let redisStatus: "connected" | "unavailable" = "connected";
+    try {
+      await connectRedis();
+      await redisClient.ping();
+    } catch {
+      redisStatus = "unavailable";
+    }
 
     return {
       status: "ok",
       database: "connected",
-      redis: "connected",
+      redis: redisStatus,
       timestamp: new Date().toISOString()
     };
   }

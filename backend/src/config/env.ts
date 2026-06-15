@@ -8,7 +8,7 @@ const envSchema = z.object({
   PORT: z.coerce.number().int().positive().default(5000),
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
   JWT_SECRET: z.string().min(32, "JWT_SECRET must be at least 32 characters"),
-  REDIS_URL: z.string().min(1, "REDIS_URL is required"),
+  REDIS_URL: z.string().optional(),
   CHANNEL_SERVICE_URL: z.string().url("CHANNEL_SERVICE_URL must be a valid URL").default("http://localhost:5001")
 });
 

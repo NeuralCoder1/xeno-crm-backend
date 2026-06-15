@@ -9,8 +9,14 @@ let isShuttingDown = false;
 
 async function verifyDependencies(): Promise<void> {
   await prisma.$queryRaw`SELECT 1`;
-  await connectRedis();
-  await redisClient.ping();
+
+  try {
+    await connectRedis();
+    await redisClient.ping();
+    console.log("Redis connected");
+  } catch (error) {
+    console.warn("Redis unavailable. Continuing without Redis.");
+  }
 }
 
 async function shutdown(signal: NodeJS.Signals): Promise<void> {
