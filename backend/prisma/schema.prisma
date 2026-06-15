@@ -1,0 +1,207 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum CustomerStatus {
+  active
+  inactive
+  blocked
+  deleted
+}
+
+enum OrderStatus {
+  pending
+  paid
+  fulfilled
+  cancelled
+  refunded
+}
+
+enum SegmentStatus {
+  draft
+  active
+  archived
+}
+
+enum CampaignType {
+  promotional
+  transactional
+  winback
+  announcement
+}
+
+enum Channel {
+  email
+  sms
+  whatsapp
+  push
+  rcs
+}
+
+enum CampaignStatus {
+  draft
+  scheduled
+  running
+  paused
+  completed
+  cancelled
+  failed
+}
+
+enum CommunicationStatus {
+  queued
+  sent
+  delivered
+  opened
+  clicked
+  bounced
+  failed
+  unsubscribed
+  converted
+}
+
+model Customer {
+  id              String             @id @default(uuid())
+  firstName       String?
+  lastName        String?
+  email           String?            @unique
+  phone           String?            @unique
+  externalId      String?            @unique
+  status          CustomerStatus     @default(active)
+  attributes      Json?
+  lifetimeValue   Decimal            @default(0) @db.Decimal(12, 2)
+  orderCount      Int                @default(0)
+  lastOrderAt     DateTime?
+  consentEmail    Boolean            @default(false)
+  consentSms      Boolean            @default(false)
+  consentWhatsapp Boolean            @default(false)
+  consentPush     Boolean            @default(false)
+  consentRcs      Boolean            @default(false)
+  consentUpdatedAt DateTime?
+  source          String?
+  createdBy       String?
+  updatedBy       String?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  orders          Order[]
+  communications  CommunicationLog[]
+
+  @@index([status, createdAt])
+  @@map("customers")
+}
+
+model Order {
+  id              String      @id @default(uuid())
+  customerId      String
+  externalOrderId String?     @unique
+  status          OrderStatus @default(pending)
+  currency        String
+  subtotal        Decimal     @db.Decimal(12, 2)
+  discountTotal   Decimal     @default(0) @db.Decimal(12, 2)
+  taxTotal        Decimal     @default(0) @db.Decimal(12, 2)
+  shippingTotal   Decimal     @default(0) @db.Decimal(12, 2)
+  grandTotal      Decimal     @db.Decimal(12, 2)
+  items           Json
+  orderedAt       DateTime
+  metadata        Json?
+  createdBy       String?
+  updatedBy       String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  customer        Customer    @relation(fields: [customerId], references: [id])
+
+  @@index([customerId, orderedAt])
+  @@index([status, orderedAt])
+  @@map("orders")
+}
+
+model Segment {
+  id                    String         @id @default(uuid())
+  name                  String
+  description           String?
+  status                SegmentStatus  @default(draft)
+  rules                 Json
+  estimatedAudienceSize Int?
+  lastEvaluatedAt       DateTime?
+  version               Int            @default(1)
+  createdBy             String?
+  updatedBy             String?
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+  campaigns             Campaign[]
+
+  @@index([status, updatedAt])
+  @@map("segments")
+}
+
+model Campaign {
+  id               String             @id @default(uuid())
+  name             String
+  description      String?
+  type             CampaignType
+  channel          Channel
+  status           CampaignStatus     @default(draft)
+  segmentId        String
+  segmentVersion   Int?
+  templateId       String?
+  content          Json
+  scheduledAt      DateTime?
+  launchedAt       DateTime?
+  completedAt      DateTime?
+  audienceSnapshot Json?
+  metrics          Json
+  failureReason    String?
+  createdBy        String?
+  updatedBy        String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  segment          Segment            @relation(fields: [segmentId], references: [id])
+  communications   CommunicationLog[]
+
+  @@index([status, scheduledAt])
+  @@index([segmentId, createdAt])
+  @@map("campaigns")
+}
+
+model CommunicationLog {
+  id               String              @id @default(uuid())
+  campaignId       String
+  customerId       String
+  channel          Channel
+  recipient        String
+  status           CommunicationStatus @default(queued)
+  channelMessageId String?             @unique
+  idempotencyKey   String              @unique
+  events           Json
+  lastEventAt      DateTime?
+  errorCode        String?
+  errorMessage     String?
+  createdBy        String?
+  updatedBy        String?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  campaign         Campaign            @relation(fields: [campaignId], references: [id])
+  customer         Customer            @relation(fields: [customerId], references: [id])
+
+  @@unique([campaignId, customerId, channel])
+  @@index([campaignId, status])
+  @@index([customerId, createdAt])
+  @@map("communicationlogs")
+}
+
+model AISession {
+  id                 String   @id @default(uuid())
+  userPrompt         String
+  generatedSegment   Json?
+  generatedMessage   Json?
+  recommendedChannel Channel?
+  createdAt          DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("aiSessions")
+}

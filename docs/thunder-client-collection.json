@@ -1,0 +1,166 @@
+{
+  "_type": "collection",
+  "name": "Xeno CRM",
+  "requests": [
+    {
+      "name": "Demo Login",
+      "request": {
+        "url": "{{baseUrl}}/api/auth/demo-login",
+        "method": "POST",
+        "headers": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"email\": \"demo@example.com\"\n}" }
+      }
+    },
+    {
+      "name": "Dashboard",
+      "request": {
+        "url": "{{baseUrl}}/api/dashboard",
+        "method": "GET",
+        "headers": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+      }
+    },
+    {
+      "name": "List Customers",
+      "request": {
+        "url": "{{baseUrl}}/api/customers?page=1&limit=20",
+        "method": "GET",
+        "headers": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+      }
+    },
+    {
+      "name": "Create Segment",
+      "request": {
+        "url": "{{baseUrl}}/api/audience/segments",
+        "method": "POST",
+        "headers": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"name\": \"My Segment\",\n  \"rules\": []\n}" }
+      }
+    },
+    {
+      "name": "Preview Audience",
+      "request": {
+        "url": "{{baseUrl}}/api/audience/segments/{{segmentId}}/preview",
+        "method": "POST",
+        "headers": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{}" }
+      }
+    },
+    {
+      "name": "Create Campaign",
+      "request": {
+        "url": "{{baseUrl}}/api/campaigns",
+        "method": "POST",
+        "headers": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"name\": \"My Campaign\",\n  \"segmentId\": \"{{segmentId}}\"\n}" }
+      }
+    },
+    {
+      "name": "List Campaigns",
+      "request": {
+        "url": "{{baseUrl}}/api/campaigns?page=1&limit=20",
+        "method": "GET",
+        "headers": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+      }
+    },
+    {
+      "name": "List Logs",
+      "request": {
+        "url": "{{baseUrl}}/api/communication-logs?page=1&limit=20",
+        "method": "GET",
+        "headers": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+      }
+    },
+    {
+      "name": "Get Log",
+      "request": {
+        "url": "{{baseUrl}}/api/communication-logs/{{id}}",
+        "method": "GET",
+        "headers": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+      }
+    },
+    {
+      "name": "AI Generate Segment",
+      "request": {
+        "url": "{{baseUrl}}/api/ai/generate-segment",
+        "method": "POST",
+        "headers": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{}" }
+      }
+    },
+    {
+      "name": "AI Generate Message",
+      "request": {
+        "url": "{{baseUrl}}/api/ai/generate-message",
+        "method": "POST",
+        "headers": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{}" }
+      }
+    },
+    {
+      "name": "AI Recommend Channel",
+      "request": {
+        "url": "{{baseUrl}}/api/ai/recommend-channel",
+        "method": "POST",
+        "headers": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{}" }
+      }
+    },
+    {
+      "name": "AI Copilot",
+      "request": {
+        "url": "{{baseUrl}}/api/ai/copilot",
+        "method": "POST",
+        "headers": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{ \"prompt\": \"Generate campaign\" }" }
+      }
+    },
+    {
+      "name": "Channel Callback",
+      "request": {
+        "url": "{{baseUrl}}/api/callbacks/channel-events",
+        "method": "POST",
+        "headers": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{ \"event\": \"delivered\" }" }
+      }
+    },
+    {
+      "name": "Retry Communication",
+      "request": {
+        "url": "{{baseUrl}}/api/communication-logs/{{id}}/retry",
+        "method": "POST",
+        "headers": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{}" }
+      }
+    },
+    {
+      "name": "Health Check",
+      "request": { "url": "{{baseUrl}}/health", "method": "GET" }
+    }
+  ]
+}
