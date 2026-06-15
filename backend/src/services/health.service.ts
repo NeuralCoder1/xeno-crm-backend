@@ -3,7 +3,7 @@ import { connectRedis, redisClient } from "../config/redis";
 
 export interface HealthStatus {
   status: "ok";
-  database: "connected";
+  database: "healthy";
   redis: "connected" | "unavailable";
   timestamp: string;
 }
@@ -22,7 +22,7 @@ export class HealthService {
 
     return {
       status: "ok",
-      database: "connected",
+      database: "healthy",
       redis: redisStatus,
       timestamp: new Date().toISOString()
     };

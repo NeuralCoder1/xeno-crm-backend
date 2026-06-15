@@ -13,7 +13,7 @@ async function verifyDependencies(): Promise<void> {
   try {
     await connectRedis();
     await redisClient.ping();
-    console.log("Redis connected");
+    console.info("Redis connected");
   } catch (error) {
     console.warn("Redis unavailable. Continuing without Redis.");
   }
@@ -40,7 +40,11 @@ async function shutdown(signal: NodeJS.Signals): Promise<void> {
     });
   }
 
-  await disconnectRedis();
+  try {
+    await disconnectRedis();
+  } catch (error) {
+    console.warn("Redis disconnect skipped");
+  }
   await prisma.$disconnect();
   process.exit(0);
 }
