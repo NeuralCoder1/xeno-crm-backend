@@ -13,7 +13,7 @@ async function verifyDependencies(): Promise<void> {
   try {
     await connectRedis();
     await redisClient.ping();
-    console.info("Redis connected");
+    console.log("Redis connected");
   } catch (error) {
     console.warn("Redis unavailable. Continuing without Redis.");
   }

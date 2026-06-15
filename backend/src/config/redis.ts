@@ -24,8 +24,12 @@ if (env.NODE_ENV !== "production") {
 }
 
 export async function connectRedis(): Promise<void> {
-  if (!redisClient.isOpen) {
-    await redisClient.connect();
+  try {
+    if (!redisClient.isOpen) {
+      await redisClient.connect();
+    }
+  } catch (error) {
+    console.warn("Redis connection skipped");
   }
 }
 

@@ -2,8 +2,8 @@ import { prisma } from "../config/db";
 import { connectRedis, redisClient } from "../config/redis";
 
 export interface HealthStatus {
-  status: "ok";
-  database: "healthy";
+  status: "ok" | "healthy";
+  database: "connected" | "healthy";
   redis: "connected" | "unavailable";
   timestamp: string;
 }
@@ -21,8 +21,8 @@ export class HealthService {
     }
 
     return {
-      status: "ok",
-      database: "healthy",
+      status: "healthy",
+      database: "connected",
       redis: redisStatus,
       timestamp: new Date().toISOString()
     };
