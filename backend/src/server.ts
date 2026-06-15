@@ -1,6 +1,5 @@
 import type { Server } from "http";
 import { prisma } from "./config/db";
-import { connectRedis, disconnectRedis, redisClient } from "./config/redis";
 import { env } from "./config/env";
 import { app } from "./app";
 
@@ -9,14 +8,6 @@ let isShuttingDown = false;
 
 async function verifyDependencies(): Promise<void> {
   await prisma.$queryRaw`SELECT 1`;
-
-  try {
-    await connectRedis();
-    await redisClient.ping();
-    console.log("Redis connected");
-  } catch (error) {
-    console.warn("Redis unavailable. Continuing without Redis.");
-  }
 }
 
 async function shutdown(signal: NodeJS.Signals): Promise<void> {
@@ -40,11 +31,6 @@ async function shutdown(signal: NodeJS.Signals): Promise<void> {
     });
   }
 
-  try {
-    await disconnectRedis();
-  } catch (error) {
-    console.warn("Redis disconnect skipped");
-  }
   await prisma.$disconnect();
   process.exit(0);
 }

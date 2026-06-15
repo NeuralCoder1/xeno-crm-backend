@@ -11,12 +11,11 @@ Xeno CRM is an AI-Native Customer Relationship Management and Campaign Managemen
 The system is split into three independent services designed to decouple campaign orchestration from delivery execution:
 
 * **Frontend**: A Next.js application built with TypeScript, React, and a modern styled component UI.
-* **Backend**: An Express.js REST API using TypeScript and Prisma ORM to communicate with PostgreSQL and Redis.
+* **Backend**: An Express.js REST API using TypeScript and Prisma ORM to communicate with PostgreSQL.
 * **PostgreSQL**: Relational database storing customer profiles, segments, campaigns, and delivery logs.
-* **Redis**: Acts as an ephemeral job queue for message dispatch, locking, and rate-limiting.
 * **Channel Service**: A separate Node.js service simulating message dispatching and tracking delivery lifecycle events (queued, sent, delivered, failed) via webhook callbacks back to the CRM backend.
 
-### ASCII Architecture Diagram
+#### ASCII Architecture Diagram
 
 ```text
   ┌────────────────────────────────────────────────────────┐
@@ -29,19 +28,17 @@ The system is split into three independent services designed to decouple campaig
   ┌────────────────────────────────────────────────────────┐
   │                    Express Backend                     │
   │                  (REST API Service)                    │
-  └───────┬────────────┬─────────────┬─────────────┬───────┘
-          │            │             │             ▲
-   Prisma │     Pub/Sub│      Pub/Sub│             │
-     Link │      Queues│     Callback│    HTTP POST│ Webhook Callback
-          ▼            ▼             ▼             │ (status update)
-  ┌───────────┐  ┌───────────┐  ┌───────────┐      │
-  │PostgreSQL │  │   Redis   │  │   Redis   │      │
-  │ Database  │  │(Job Queue)│  │(Rate Limit│      │
-  └───────────┘  └─────┬─────┘  └───────────┘      │
-                       │                           │
-              Outbound │ Send message              │
-              Delivery │ request                   │
-                       ▼                           │
+  └───────┬────────────────────────────────────────▲───────┘
+          │                                        │
+   Prisma │ Outbound Message                       │ Webhook Callback
+     Link │ Dispatch (HTTP)                        │ (status update)
+          ▼                                        │
+  ┌───────────┐                                    │
+  │PostgreSQL │                                    │
+  │ Database  │                                    │
+  └───────────┘                                    │
+          │                                        │
+          ▼                                        │
   ┌────────────────────────────────────────────────┴───────┐
   │                    Channel Service                     │
   │              (Delivery Simulation Engine)              │
@@ -76,13 +73,12 @@ The system is split into three independent services designed to decouple campaig
 * TypeScript
 * Prisma ORM
 * PostgreSQL
-* Redis (Rate limiting and Queues)
 
 ---
 
 ## Local Setup
 
-Ensure that both PostgreSQL and Redis servers are running locally on their default ports.
+Ensure that the PostgreSQL database server is running locally on its default port.
 
 ### Backend
 
@@ -153,7 +149,6 @@ Ensure that both PostgreSQL and Redis servers are running locally on their defau
 
 ### Backend (`backend/.env`)
 * `DATABASE_URL`: PostgreSQL connection string (e.g. `postgresql://postgres:postgres@localhost:5432/xeno_crm`)
-* `REDIS_URL`: Redis connection URL (e.g. `redis://localhost:6379`)
 * `JWT_SECRET`: Token signature secret key
 * `PORT`: Server port (default: `5000`)
 
@@ -265,7 +260,6 @@ Xeno-crm/
 ## Assumptions
 
 * The PostgreSQL database server is active on `localhost:5432` with a database named `xeno_crm` (creds: `postgres/postgres`).
-* The local Redis server is active on port `6379`.
 * The development processes are configured to bind to:
   * Backend: port `5000`
   * Frontend: port `3000`
