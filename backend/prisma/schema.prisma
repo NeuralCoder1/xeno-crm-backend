@@ -7,89 +7,31 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum CustomerStatus {
-  active
-  inactive
-  blocked
-  deleted
-}
-
-enum OrderStatus {
-  pending
-  paid
-  fulfilled
-  cancelled
-  refunded
-}
-
-enum SegmentStatus {
-  draft
-  active
-  archived
-}
-
-enum CampaignType {
-  promotional
-  transactional
-  winback
-  announcement
-}
-
-enum Channel {
-  email
-  sms
-  whatsapp
-  push
-  rcs
-}
-
-enum CampaignStatus {
-  draft
-  scheduled
-  running
-  paused
-  completed
-  cancelled
-  failed
-}
-
-enum CommunicationStatus {
-  queued
-  sent
-  delivered
-  opened
-  clicked
-  bounced
-  failed
-  unsubscribed
-  converted
-}
-
 model Customer {
-  id              String             @id @default(uuid())
-  firstName       String?
-  lastName        String?
-  email           String?            @unique
-  phone           String?            @unique
-  externalId      String?            @unique
-  status          CustomerStatus     @default(active)
-  attributes      Json?
-  lifetimeValue   Decimal            @default(0) @db.Decimal(12, 2)
-  orderCount      Int                @default(0)
-  lastOrderAt     DateTime?
-  consentEmail    Boolean            @default(false)
-  consentSms      Boolean            @default(false)
-  consentWhatsapp Boolean            @default(false)
-  consentPush     Boolean            @default(false)
-  consentRcs      Boolean            @default(false)
+  id               String             @id @default(uuid())
+  firstName        String?
+  lastName         String?
+  email            String?            @unique
+  phone            String?            @unique
+  externalId       String?            @unique
+  status           CustomerStatus     @default(active)
+  attributes       Json?
+  lifetimeValue    Decimal            @default(0) @db.Decimal(12, 2)
+  orderCount       Int                @default(0)
+  lastOrderAt      DateTime?
+  consentEmail     Boolean            @default(false)
+  consentSms       Boolean            @default(false)
+  consentWhatsapp  Boolean            @default(false)
+  consentPush      Boolean            @default(false)
+  consentRcs       Boolean            @default(false)
   consentUpdatedAt DateTime?
-  source          String?
-  createdBy       String?
-  updatedBy       String?
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
-  orders          Order[]
-  communications  CommunicationLog[]
+  source           String?
+  createdBy        String?
+  updatedBy        String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  communications   CommunicationLog[]
+  orders           Order[]
 
   @@index([status, createdAt])
   @@map("customers")
@@ -121,18 +63,18 @@ model Order {
 }
 
 model Segment {
-  id                    String         @id @default(uuid())
+  id                    String        @id @default(uuid())
   name                  String
   description           String?
-  status                SegmentStatus  @default(draft)
+  status                SegmentStatus @default(draft)
   rules                 Json
   estimatedAudienceSize Int?
   lastEvaluatedAt       DateTime?
-  version               Int            @default(1)
+  version               Int           @default(1)
   createdBy             String?
   updatedBy             String?
-  createdAt             DateTime       @default(now())
-  updatedAt             DateTime       @updatedAt
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
   campaigns             Campaign[]
 
   @@index([status, updatedAt])
@@ -204,4 +146,62 @@ model AISession {
 
   @@index([createdAt])
   @@map("aiSessions")
+}
+
+enum CustomerStatus {
+  active
+  inactive
+  blocked
+  deleted
+}
+
+enum OrderStatus {
+  pending
+  paid
+  fulfilled
+  cancelled
+  refunded
+}
+
+enum SegmentStatus {
+  draft
+  active
+  archived
+}
+
+enum CampaignType {
+  promotional
+  transactional
+  winback
+  announcement
+}
+
+enum Channel {
+  email
+  sms
+  whatsapp
+  push
+  rcs
+}
+
+enum CampaignStatus {
+  draft
+  scheduled
+  running
+  paused
+  completed
+  cancelled
+  failed
+}
+
+enum CommunicationStatus {
+  queued
+  sent
+  delivered
+  opened
+  clicked
+  bounced
+  failed
+  unsubscribed
+  converted
 }
